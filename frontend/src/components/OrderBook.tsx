@@ -1,13 +1,19 @@
-import { useEffect, useState } from 'react';
-import { Order, OrderRequest, OrderSide, OrderType, TimeInForce } from '../types';
-import { api } from '../services/api';
-import { Plus, X, Play, RefreshCw, Filter } from 'lucide-react';
+import { useEffect, useState } from "react";
+import {
+  Order,
+  OrderRequest,
+  OrderSide,
+  OrderType,
+  TimeInForce,
+} from "../types";
+import { api } from "../services/api";
+import { Plus, X, Play, RefreshCw, Filter } from "lucide-react";
 
 export default function OrderBook() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
-  const [statusFilter, setStatusFilter] = useState<string>('');
+  const [statusFilter, setStatusFilter] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
@@ -18,10 +24,12 @@ export default function OrderBook() {
   async function loadOrders() {
     setLoading(true);
     try {
-      const data = await api.getOrders(statusFilter ? { status: statusFilter } : undefined);
+      const data = await api.getOrders(
+        statusFilter ? { status: statusFilter } : undefined,
+      );
       setOrders(data);
     } catch (err) {
-      console.error('Failed to load orders', err);
+      console.error("Failed to load orders", err);
     } finally {
       setLoading(false);
     }
@@ -30,11 +38,11 @@ export default function OrderBook() {
   async function handleCancel(id: number) {
     try {
       await api.cancelOrder(id);
-      setSuccessMsg('Order cancelled successfully');
+      setSuccessMsg("Order cancelled successfully");
       loadOrders();
       setTimeout(() => setSuccessMsg(null), 3000);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to cancel order');
+      setError(err instanceof Error ? err.message : "Failed to cancel order");
       setTimeout(() => setError(null), 3000);
     }
   }
@@ -42,11 +50,11 @@ export default function OrderBook() {
   async function handleExecute(id: number) {
     try {
       await api.executeOrder(id);
-      setSuccessMsg('Order executed successfully');
+      setSuccessMsg("Order executed successfully");
       loadOrders();
       setTimeout(() => setSuccessMsg(null), 3000);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to execute order');
+      setError(err instanceof Error ? err.message : "Failed to execute order");
       setTimeout(() => setError(null), 3000);
     }
   }
@@ -54,12 +62,12 @@ export default function OrderBook() {
   return (
     <div className="space-y-4">
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/50 text-red-700 dark:text-red-300 px-4 py-3 rounded-lg text-sm">
           {error}
         </div>
       )}
       {successMsg && (
-        <div className="bg-emerald-50 border border-emerald-200 text-emerald-700 px-4 py-3 rounded-lg text-sm">
+        <div className="bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800/50 text-emerald-700 dark:text-emerald-300 px-4 py-3 rounded-lg text-sm">
           {successMsg}
         </div>
       )}
@@ -67,11 +75,11 @@ export default function OrderBook() {
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2">
-            <Filter className="h-4 w-4 text-gray-400" />
+            <Filter className="h-4 w-4 text-gray-400 dark:text-slate-500" />
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="bg-white dark:bg-slate-700 border border-gray-300 dark:border-slate-600 rounded-lg px-3 py-2 text-sm text-gray-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
             >
               <option value="">All Statuses</option>
               <option value="OPEN">Open</option>
@@ -83,7 +91,7 @@ export default function OrderBook() {
           </div>
           <button
             onClick={loadOrders}
-            className="flex items-center gap-1.5 px-3 py-2 text-sm text-gray-600 hover:text-gray-900 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+            className="flex items-center gap-1.5 px-3 py-2 text-sm text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-slate-300 border border-gray-300 dark:border-slate-600 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors"
           >
             <RefreshCw className="h-4 w-4" />
             Refresh
@@ -103,7 +111,7 @@ export default function OrderBook() {
           onSubmit={async (order) => {
             await api.createOrder(order);
             setShowForm(false);
-            setSuccessMsg('Order created successfully');
+            setSuccessMsg("Order created successfully");
             loadOrders();
             setTimeout(() => setSuccessMsg(null), 3000);
           }}
@@ -115,36 +123,68 @@ export default function OrderBook() {
         />
       )}
 
-      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+      <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+          <table className="w-full text-base">
             <thead>
-              <tr className="bg-gray-50 border-b border-gray-200">
-                <th className="text-left py-3 px-4 font-medium text-gray-500">ID</th>
-                <th className="text-left py-3 px-4 font-medium text-gray-500">Symbol</th>
-                <th className="text-left py-3 px-4 font-medium text-gray-500">Side</th>
-                <th className="text-left py-3 px-4 font-medium text-gray-500">Type</th>
-                <th className="text-right py-3 px-4 font-medium text-gray-500">Qty</th>
-                <th className="text-right py-3 px-4 font-medium text-gray-500">Filled</th>
-                <th className="text-right py-3 px-4 font-medium text-gray-500">Price</th>
-                <th className="text-right py-3 px-4 font-medium text-gray-500">Avg Fill</th>
-                <th className="text-left py-3 px-4 font-medium text-gray-500">Status</th>
-                <th className="text-left py-3 px-4 font-medium text-gray-500">Account</th>
-                <th className="text-left py-3 px-4 font-medium text-gray-500">TIF</th>
-                <th className="text-left py-3 px-4 font-medium text-gray-500">Created</th>
-                <th className="text-center py-3 px-4 font-medium text-gray-500">Actions</th>
+              <tr className="bg-gray-50 dark:bg-slate-900 border-b border-gray-200 dark:border-slate-700">
+                <th className="text-left py-3 px-4 font-medium text-gray-500 dark:text-slate-400">
+                  ID
+                </th>
+                <th className="text-left py-3 px-4 font-medium text-gray-500 dark:text-slate-400">
+                  Symbol
+                </th>
+                <th className="text-left py-3 px-4 font-medium text-gray-500 dark:text-slate-400">
+                  Side
+                </th>
+                <th className="text-left py-3 px-4 font-medium text-gray-500 dark:text-slate-400">
+                  Type
+                </th>
+                <th className="text-right py-3 px-4 font-medium text-gray-500 dark:text-slate-400">
+                  Qty
+                </th>
+                <th className="text-right py-3 px-4 font-medium text-gray-500 dark:text-slate-400">
+                  Filled
+                </th>
+                <th className="text-right py-3 px-4 font-medium text-gray-500 dark:text-slate-400">
+                  Price
+                </th>
+                <th className="text-right py-3 px-4 font-medium text-gray-500 dark:text-slate-400">
+                  Avg Fill
+                </th>
+                <th className="text-left py-3 px-4 font-medium text-gray-500 dark:text-slate-400">
+                  Status
+                </th>
+                <th className="text-left py-3 px-4 font-medium text-gray-500 dark:text-slate-400">
+                  Account
+                </th>
+                <th className="text-left py-3 px-4 font-medium text-gray-500 dark:text-slate-400">
+                  TIF
+                </th>
+                <th className="text-left py-3 px-4 font-medium text-gray-500 dark:text-slate-400">
+                  Created
+                </th>
+                <th className="text-center py-3 px-4 font-medium text-gray-500 dark:text-slate-400">
+                  Actions
+                </th>
               </tr>
             </thead>
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan={13} className="py-8 text-center text-gray-400">
+                  <td
+                    colSpan={13}
+                    className="py-8 text-center text-gray-400 dark:text-slate-500"
+                  >
                     Loading...
                   </td>
                 </tr>
               ) : orders.length === 0 ? (
                 <tr>
-                  <td colSpan={13} className="py-8 text-center text-gray-400">
+                  <td
+                    colSpan={13}
+                    className="py-8 text-center text-gray-400 dark:text-slate-500"
+                  >
                     No orders found
                   </td>
                 </tr>
@@ -152,52 +192,69 @@ export default function OrderBook() {
                 orders.map((order) => (
                   <tr
                     key={order.id}
-                    className="border-b border-gray-100 hover:bg-gray-50 transition-colors"
+                    className="border-b border-gray-100 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors"
                   >
-                    <td className="py-3 px-4 font-mono text-gray-600">#{order.id}</td>
-                    <td className="py-3 px-4 font-semibold text-gray-900">{order.symbol}</td>
+                    <td className="py-3 px-4 font-mono text-gray-600 dark:text-slate-400">
+                      #{order.id}
+                    </td>
+                    <td className="py-3 px-4 font-semibold text-gray-900 dark:text-slate-100">
+                      {order.symbol}
+                    </td>
                     <td className="py-3 px-4">
                       <span
                         className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
-                          order.side === 'BUY'
-                            ? 'bg-emerald-100 text-emerald-700'
-                            : 'bg-red-100 text-red-700'
+                          order.side === "BUY"
+                            ? "bg-emerald-100 text-emerald-700"
+                            : "bg-red-100 text-red-700"
                         }`}
                       >
                         {order.side}
                       </span>
                     </td>
-                    <td className="py-3 px-4 text-gray-600">{order.type}</td>
-                    <td className="py-3 px-4 text-right font-mono">{order.quantity}</td>
-                    <td className="py-3 px-4 text-right font-mono">{order.filledQuantity}</td>
-                    <td className="py-3 px-4 text-right font-mono">
-                      {order.price ? `$${order.price.toFixed(2)}` : '-'}
+                    <td className="py-3 px-4 text-gray-600 dark:text-slate-400">
+                      {order.type}
                     </td>
-                    <td className="py-3 px-4 text-right font-mono">
-                      {order.avgFillPrice ? `$${order.avgFillPrice.toFixed(2)}` : '-'}
+                    <td className="py-3 px-4 text-right font-mono text-gray-900 dark:text-slate-100">
+                      {order.quantity}
+                    </td>
+                    <td className="py-3 px-4 text-right font-mono text-gray-900 dark:text-slate-100">
+                      {order.filledQuantity}
+                    </td>
+                    <td className="py-3 px-4 text-right font-mono text-gray-900 dark:text-slate-100">
+                      {order.price ? `$${order.price.toFixed(2)}` : "-"}
+                    </td>
+                    <td className="py-3 px-4 text-right font-mono text-gray-900 dark:text-slate-100">
+                      {order.avgFillPrice
+                        ? `$${order.avgFillPrice.toFixed(2)}`
+                        : "-"}
                     </td>
                     <td className="py-3 px-4">
                       <StatusBadge status={order.status} />
                     </td>
-                    <td className="py-3 px-4 text-gray-600">{order.account}</td>
-                    <td className="py-3 px-4 text-gray-600">{order.timeInForce}</td>
-                    <td className="py-3 px-4 text-gray-500 text-xs whitespace-nowrap">
+                    <td className="py-3 px-4 text-gray-600 dark:text-slate-400">
+                      {order.account}
+                    </td>
+                    <td className="py-3 px-4 text-gray-600 dark:text-slate-400">
+                      {order.timeInForce}
+                    </td>
+                    <td className="py-3 px-4 text-gray-500 dark:text-slate-500 text-xs whitespace-nowrap">
                       {new Date(order.createdAt).toLocaleString()}
                     </td>
                     <td className="py-3 px-4">
                       <div className="flex items-center justify-center gap-1">
-                        {(order.status === 'OPEN' || order.status === 'PARTIALLY_FILLED') && (
+                        {(order.status === "OPEN" ||
+                          order.status === "PARTIALLY_FILLED") && (
                           <>
                             <button
                               onClick={() => handleExecute(order.id)}
-                              className="p-1.5 text-emerald-600 hover:bg-emerald-50 rounded-md transition-colors"
+                              className="p-1.5 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 rounded-md transition-colors"
                               title="Execute"
                             >
                               <Play className="h-4 w-4" />
                             </button>
                             <button
                               onClick={() => handleCancel(order.id)}
-                              className="p-1.5 text-red-600 hover:bg-red-50 rounded-md transition-colors"
+                              className="p-1.5 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-md transition-colors"
                               title="Cancel"
                             >
                               <X className="h-4 w-4" />
@@ -226,15 +283,15 @@ function OrderForm({
   onCancel: () => void;
   onError: (msg: string) => void;
 }) {
-  const [symbol, setSymbol] = useState('');
-  const [side, setSide] = useState<OrderSide>('BUY');
-  const [type, setType] = useState<OrderType>('MARKET');
-  const [quantity, setQuantity] = useState('');
-  const [price, setPrice] = useState('');
-  const [stopPrice, setStopPrice] = useState('');
-  const [account, setAccount] = useState('ACC-001');
-  const [timeInForce, setTimeInForce] = useState<TimeInForce>('DAY');
-  const [notes, setNotes] = useState('');
+  const [symbol, setSymbol] = useState("");
+  const [side, setSide] = useState<OrderSide>("BUY");
+  const [type, setType] = useState<OrderType>("MARKET");
+  const [quantity, setQuantity] = useState("");
+  const [price, setPrice] = useState("");
+  const [stopPrice, setStopPrice] = useState("");
+  const [account, setAccount] = useState("ACC-001");
+  const [timeInForce, setTimeInForce] = useState<TimeInForce>("DAY");
+  const [notes, setNotes] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
@@ -254,56 +311,68 @@ function OrderForm({
       if (notes) order.notes = notes;
       await onSubmit(order);
     } catch (err) {
-      onError(err instanceof Error ? err.message : 'Failed to create order');
+      onError(err instanceof Error ? err.message : "Failed to create order");
     } finally {
       setSubmitting(false);
     }
   }
 
-  const showPrice = type === 'LIMIT' || type === 'STOP_LIMIT';
-  const showStopPrice = type === 'STOP' || type === 'STOP_LIMIT';
+  const showPrice = type === "LIMIT" || type === "STOP_LIMIT";
+  const showStopPrice = type === "STOP" || type === "STOP_LIMIT";
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-6">
+    <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-6">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-semibold text-gray-900">Create New Order</h3>
-        <button onClick={onCancel} className="text-gray-400 hover:text-gray-600">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100">
+          Create New Order
+        </h3>
+        <button
+          onClick={onCancel}
+          className="text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-400"
+        >
           <X className="h-5 w-5" />
         </button>
       </div>
-      <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <form
+        onSubmit={handleSubmit}
+        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"
+      >
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Symbol</label>
+          <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
+            Symbol
+          </label>
           <input
             type="text"
             value={symbol}
             onChange={(e) => setSymbol(e.target.value)}
             placeholder="e.g. AAPL"
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 rounded-lg px-3 py-2 text-sm text-gray-900 dark:text-slate-100 placeholder-gray-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
             required
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Side</label>
+          <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
+            Side
+          </label>
           <div className="flex gap-2">
             <button
               type="button"
-              onClick={() => setSide('BUY')}
+              onClick={() => setSide("BUY")}
               className={`flex-1 py-2 rounded-lg text-sm font-medium transition-colors ${
-                side === 'BUY'
-                  ? 'bg-emerald-600 text-white'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                side === "BUY"
+                  ? "bg-emerald-600 text-white"
+                  : "bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-slate-400 hover:bg-gray-200 dark:hover:bg-slate-600"
               }`}
             >
               BUY
             </button>
             <button
               type="button"
-              onClick={() => setSide('SELL')}
+              onClick={() => setSide("SELL")}
               className={`flex-1 py-2 rounded-lg text-sm font-medium transition-colors ${
-                side === 'SELL'
-                  ? 'bg-red-600 text-white'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                side === "SELL"
+                  ? "bg-red-600 text-white"
+                  : "bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-slate-400 hover:bg-gray-200 dark:hover:bg-slate-600"
               }`}
             >
               SELL
@@ -311,11 +380,13 @@ function OrderForm({
           </div>
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Order Type</label>
+          <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
+            Order Type
+          </label>
           <select
             value={type}
             onChange={(e) => setType(e.target.value as OrderType)}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 rounded-lg px-3 py-2 text-sm text-gray-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
           >
             <option value="MARKET">Market</option>
             <option value="LIMIT">Limit</option>
@@ -324,20 +395,24 @@ function OrderForm({
           </select>
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Quantity</label>
+          <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
+            Quantity
+          </label>
           <input
             type="number"
             value={quantity}
             onChange={(e) => setQuantity(e.target.value)}
             placeholder="100"
             min="1"
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 rounded-lg px-3 py-2 text-sm text-gray-900 dark:text-slate-100 placeholder-gray-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
             required
           />
         </div>
         {showPrice && (
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Limit Price</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
+              Limit Price
+            </label>
             <input
               type="number"
               value={price}
@@ -345,14 +420,16 @@ function OrderForm({
               placeholder="0.00"
               step="0.01"
               min="0.01"
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 rounded-lg px-3 py-2 text-sm text-gray-900 dark:text-slate-100 placeholder-gray-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
               required
             />
           </div>
         )}
         {showStopPrice && (
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Stop Price</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
+              Stop Price
+            </label>
             <input
               type="number"
               value={stopPrice}
@@ -360,28 +437,32 @@ function OrderForm({
               placeholder="0.00"
               step="0.01"
               min="0.01"
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 rounded-lg px-3 py-2 text-sm text-gray-900 dark:text-slate-100 placeholder-gray-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
               required
             />
           </div>
         )}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Account</label>
+          <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
+            Account
+          </label>
           <select
             value={account}
             onChange={(e) => setAccount(e.target.value)}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 rounded-lg px-3 py-2 text-sm text-gray-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
           >
             <option value="ACC-001">ACC-001</option>
             <option value="ACC-002">ACC-002</option>
           </select>
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Time in Force</label>
+          <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
+            Time in Force
+          </label>
           <select
             value={timeInForce}
             onChange={(e) => setTimeInForce(e.target.value as TimeInForce)}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 rounded-lg px-3 py-2 text-sm text-gray-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
           >
             <option value="DAY">Day</option>
             <option value="GTC">GTC</option>
@@ -390,29 +471,31 @@ function OrderForm({
           </select>
         </div>
         <div className="lg:col-span-2">
-          <label className="block text-sm font-medium text-gray-700 mb-1">Notes</label>
+          <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
+            Notes
+          </label>
           <input
             type="text"
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
             placeholder="Optional notes..."
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 rounded-lg px-3 py-2 text-sm text-gray-900 dark:text-slate-100 placeholder-gray-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
           />
         </div>
         <div className="lg:col-span-4 flex justify-end gap-3">
           <button
             type="button"
             onClick={onCancel}
-            className="px-4 py-2 border border-gray-300 rounded-lg text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+            className="px-4 py-2 border border-gray-300 dark:border-slate-600 rounded-lg text-sm text-gray-700 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors"
           >
             Cancel
           </button>
           <button
             type="submit"
             disabled={submitting}
-            className="px-6 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors disabled:opacity-50"
+            className="px-6 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors disabled:opacity-50 dark:disabled:opacity-40"
           >
-            {submitting ? 'Submitting...' : 'Submit Order'}
+            {submitting ? "Submitting..." : "Submit Order"}
           </button>
         </div>
       </form>
@@ -422,21 +505,24 @@ function OrderForm({
 
 function StatusBadge({ status }: { status: string }) {
   const styles: Record<string, string> = {
-    PENDING: 'bg-gray-100 text-gray-700',
-    OPEN: 'bg-blue-100 text-blue-700',
-    PARTIALLY_FILLED: 'bg-amber-100 text-amber-700',
-    FILLED: 'bg-emerald-100 text-emerald-700',
-    CANCELLED: 'bg-red-100 text-red-700',
-    REJECTED: 'bg-red-100 text-red-700',
-    EXPIRED: 'bg-gray-100 text-gray-700',
+    PENDING: "bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-slate-200",
+    OPEN: "bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300",
+    PARTIALLY_FILLED:
+      "bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300",
+    FILLED:
+      "bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300",
+    CANCELLED: "bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300",
+    REJECTED: "bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300",
+    EXPIRED: "bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-slate-200",
   };
   return (
     <span
       className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
-        styles[status] || 'bg-gray-100 text-gray-700'
+        styles[status] ||
+        "bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300"
       }`}
     >
-      {status.replace('_', ' ')}
+      {status.replace("_", " ")}
     </span>
   );
 }
